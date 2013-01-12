@@ -44,6 +44,6 @@ Who be me, and why be this?
 
 Me be Stuart Dallas, and my company is 3ft9 Ltd. I wrote this daemon to solve the problem of creating unique IDs across multiple servers for use with NoSQL databases. I'm aware that there are other established projects that also solve this problem, but I decided to write my own.
 
-Stuart Dallas
-3ft9 Ltd
+Stuart Dallas<br />
+3ft9 Ltd<br />
 http://3ft9.com/
