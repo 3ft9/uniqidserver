@@ -3,7 +3,7 @@ uniqidserver
 
 A unique ID server. Runs a TCP server. Connect to that server and it will send you an ID and immediately close the connection.
 
-    Usage: uniqidserver &lt;port&gt; &lt;machineid&gt;
+    Usage: uniqidserver <port> <machine_id>
 
 The machine ID should be a number between 0 and 255. The number is used when generating IDs. This enables you to run multiple ID servers and ensures that IDs created on different machines will never clash.
 
