@@ -26,6 +26,8 @@
  *
  * If the machine ID is not provided, is -1, or fails to convert to an integer
  * between 0 and 255, the bb part above will be excluded.
+ * 
+ * Source: https://github.com/3ft9/uniqidserver
  */
 #include <sys/socket.h>
 #include <sys/time.h>
