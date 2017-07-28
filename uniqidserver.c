@@ -39,66 +39,66 @@
 
 int main(int argc, char ** argv)
 {
-	int listenfd, connfd, port, machine_id;
-	struct sockaddr_in servaddr, cliaddr;
-	struct timeval tv;
-	socklen_t clilen;
-	char secs_buf[9], id_buf[14];
-	char machine_id_hex[3];
-
-	if (argc != 2 && argc != 3) {
-		printf("Usage: uniqidserver <port> <machineid>\n");
-		return 1;
-	}
-
-	port = atoi(argv[1]);
-	machine_id = (argc == 2 ? -1 : atoi(argv[2]));
-
-	if (machine_id < 0 || machine_id > 255) {
-		fprintf(stderr, "WARN: Not using a machine ID\n");
-		machine_id = -1;
-	} else {
-		// Convert the machine ID to hex.
-		sprintf(machine_id_hex, "%02x", machine_id);
-	}
-
-	while (1) {
-		listenfd = socket(AF_INET, SOCK_STREAM, 0);
-
-		bzero(&servaddr, sizeof(servaddr));
-		servaddr.sin_family = AF_INET;
-		servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-		servaddr.sin_port = htons(port);
-		bind(listenfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
-		listen(listenfd, 1024);
-		clilen = sizeof(cliaddr);
-
-		while (1) {
-			connfd = accept(listenfd, (struct sockaddr *)&cliaddr, &clilen);
-			if (connfd) {
-				if (gettimeofday(&tv, NULL) == -1) {
-					sendto(connfd, "ERR", 3, 0, (struct sockaddr *)&cliaddr, clilen);
-				} else {
-					if (machine_id == -1) {
-						// No machine ID.
-						snprintf(id_buf, 14, "%08x%03x", (unsigned int)tv.tv_sec, tv.tv_usec);
-					} else {
-						// With machine ID.
-						snprintf(secs_buf, 9, "%08x", (unsigned int)tv.tv_sec);
-						snprintf(id_buf, 14, "%c%c%c%c%c%c%c%c%c%c%03x",
-							secs_buf[0], secs_buf[1], secs_buf[2], secs_buf[3],
-							machine_id_hex[0], machine_id_hex[1],
-							secs_buf[4], secs_buf[5], secs_buf[6], secs_buf[7],
-							tv.tv_usec);
-					}
-					sendto(connfd, id_buf, (machine_id == -1 ? 11 : 13), 0, (struct sockaddr *)&cliaddr, clilen);
-				}
-				close(connfd);
-			}
-		}
-
-		close(listenfd);
-	}
-
-	return 0;
+  int listenfd, connfd, port, machine_id;
+  struct sockaddr_in servaddr, cliaddr;
+  struct timeval tv;
+  socklen_t clilen;
+  char secs_buf[9], id_buf[14];
+  char machine_id_hex[3];
+  
+  if (argc != 2 && argc != 3) {
+    printf("Usage: uniqidserver <port> <machineid>\n");
+    return 1;
+  }
+  
+  port = atoi(argv[1]);
+  machine_id = (argc == 2 ? -1 : atoi(argv[2]));
+  
+  if (machine_id < 0 || machine_id > 255) {
+    fprintf(stderr, "WARN: Not using a machine ID\n");
+    machine_id = -1;
+  } else {
+    // Convert the machine ID to hex.
+    sprintf(machine_id_hex, "%02x", machine_id);
+  }
+  
+  while (1) {
+    listenfd = socket(AF_INET, SOCK_STREAM, 0);
+    
+    bzero(&servaddr, sizeof(servaddr));
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    servaddr.sin_port = htons(port);
+    bind(listenfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
+    listen(listenfd, 1024);
+    clilen = sizeof(cliaddr);
+    
+    while (1) {
+      connfd = accept(listenfd, (struct sockaddr *)&cliaddr, &clilen);
+      if (connfd) {
+        if (gettimeofday(&tv, NULL) == -1) {
+          sendto(connfd, "ERR", 3, 0, (struct sockaddr *)&cliaddr, clilen);
+        } else {
+          if (machine_id == -1) {
+            // No machine ID.
+            snprintf(id_buf, 14, "%08x%03x", (unsigned int)tv.tv_sec, (unsigned int)tv.tv_usec);
+          } else {
+            // With machine ID.
+            snprintf(secs_buf, 9, "%08x", (unsigned int)tv.tv_sec);
+            snprintf(id_buf, 14, "%c%c%c%c%c%c%c%c%c%c%03x",
+                     secs_buf[0], secs_buf[1], secs_buf[2], secs_buf[3],
+                     machine_id_hex[0], machine_id_hex[1],
+                     secs_buf[4], secs_buf[5], secs_buf[6], secs_buf[7],
+                     (unsigned int)tv.tv_usec);
+          }
+          sendto(connfd, id_buf, (machine_id == -1 ? 11 : 13), 0, (struct sockaddr *)&cliaddr, clilen);
+        }
+        close(connfd);
+      }
+    }
+    
+    close(listenfd);
+  }
+  
+  return 0;
 }
